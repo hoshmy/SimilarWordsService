@@ -2,6 +2,7 @@ import os
 import sys
 
 from utilities.logger import Logger
+from configurations import configuration
 
 
 class SimilarWordsDictionaryParser:
@@ -71,4 +72,4 @@ class SimilarWordsDictionaryParser:
 
 
 if __name__ == '__main__':
-    parser = SimilarWordsDictionaryParser.parse('utilities/words_clean.txt')
+    parser = SimilarWordsDictionaryParser.parse(configuration.path_to_dictionary_file)
