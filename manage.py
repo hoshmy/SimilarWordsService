@@ -3,6 +3,9 @@
 import os
 import sys
 
+from utilities.stats_calculator import StatsCalculator
+from utilities.running_orchestrator import RunningOrchestrator
+
 
 def main():
     """Run administrative tasks."""
@@ -18,5 +21,11 @@ def main():
     execute_from_command_line(sys.argv)
 
 
+def similar_words_server_main():
+    StatsCalculator.init()
+
+
 if __name__ == '__main__':
+    similar_words_server_main()
     main()
+    RunningOrchestrator.KEEP_RUNNING = False

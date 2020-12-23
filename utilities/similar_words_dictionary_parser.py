@@ -24,7 +24,7 @@ class SimilarWordsDictionaryParser:
                 path_to_file, SimilarWordsDictionaryParser._number_of_words,
                 SimilarWordsDictionaryParser._number_of_lines, len(similar_words_groups)))
 
-        return similar_words_groups
+        return SimilarWordsDictionaryParser._number_of_words, similar_words_groups
 
     @staticmethod
     def _do_parse(path_to_file: str, similar_words_groups: dict):
