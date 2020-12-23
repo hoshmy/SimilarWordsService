@@ -13,14 +13,12 @@ def similar(request):
     if request.method == 'GET':
         word = request.GET['word']  # TODO: check if missing
         ret_dict = {'similar': []}
-        Logger.log('query for word {}'.format(word))
 
         word = word.rstrip('\n').strip().lower()
         # sorted word will be used as the information key
         sorted_word = ''.join(sorted(set(word.lower())))
         if sorted_word in similar_words_dictionary:
             ret_dict = similar_words_dictionary[sorted_word]
-            Logger.log('found similar word for {}: {}'.format(word, ret_dict))
 
         json_string = json.dumps(ret_dict)
         return HttpResponse(json_string)

@@ -54,7 +54,7 @@ class SimilarWordsDictionaryParser:
 
         if word:
             # sorted word will be used as the information key
-            sorted_word = ''.join(sorted(set(word.lower())))
+            sorted_word = ''.join(sorted(word.lower()))
 
             if sorted_word in similar_words_groups:
                 # Filter out identical words
