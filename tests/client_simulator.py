@@ -25,7 +25,6 @@ def client_thread(answers_dict, answers_keys_list):
         key_permutation = ''.join(rand_answer_key_list)
 
         response = ''
-        response_dict = {}
         # Send a GET request (blocking) to the Server
         try:
             response = requests.get(server_url, {'word': key_permutation})
@@ -34,6 +33,7 @@ def client_thread(answers_dict, answers_keys_list):
             time.sleep(reconnection_time_delta)
             continue
 
+        response_dict = {}
         if response and response.text:
             response_dict = json.loads(response.text)
 
