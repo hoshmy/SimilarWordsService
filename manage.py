@@ -23,8 +23,9 @@ def main():
 
 
 def _similar_words_server_main() -> threading.Thread:
-    stats_thread = StatsCalculator.init()
-    return stats_thread
+    if not os.environ.get('RUN_MAIN'):
+        stats_thread = StatsCalculator.init()
+        return stats_thread
 
 
 def _deinit_stats_calculator():
@@ -39,4 +40,6 @@ if __name__ == '__main__':
     # Cleanup
     RunningOrchestrator.KEEP_RUNNING = False
     _deinit_stats_calculator()
-    stats_thread.join()
+
+    if stats_thread:
+        stats_thread.join()
