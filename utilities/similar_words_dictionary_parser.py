@@ -44,10 +44,11 @@ class SimilarWordsDictionaryParser:
 
     @staticmethod
     def _add_word(line_from_file: str, similar_words_groups: dict) -> None:
-        # Remove ending \n TODO - test with \r\n
+        # Remove ending \n
+        # Remove ending \r  (For windows compatibility)
         # Remove trailing and leading white character
         # set to lower case - words meaning is case insensitive
-        word = line_from_file.rstrip('\n').strip().lower()
+        word = line_from_file.rstrip('\n').rstrip('\r').strip().lower()
 
         if word:
             # sorted word will be used as the information key

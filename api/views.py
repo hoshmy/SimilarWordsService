@@ -18,7 +18,7 @@ def similar(request: HttpRequest) -> HttpResponse:
         if 'word' in request.GET:
             # Fetched received parameter and format is
             query_word = request.GET['word']
-            clean_query_word = query_word.rstrip('\n').strip().lower()
+            clean_query_word = query_word.rstrip('\n').rstrip('\r').strip().lower()
 
             # Sorted word will be used as the information key
             sorted_word = ''.join(sorted(clean_query_word))
