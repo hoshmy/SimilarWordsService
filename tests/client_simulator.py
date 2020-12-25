@@ -3,8 +3,11 @@ import requests
 import json
 import threading
 import time
+import signal
+import sys
 
 from utilities.logger import Logger
+
 
 # Simulator configuration
 client_iterations = 100000
@@ -14,6 +17,8 @@ expected_answers_file = 'generated_answers.txt'
 clients_launch_time_delta = 1
 server_url = 'http://127.0.0.1:8000/api/v1/similar'
 reconnection_time_delta = 5
+
+KEEP_RUNNING = False
 
 
 def _client_send_request_blocking(word: str) -> requests.Response:
@@ -47,6 +52,9 @@ def _client_compare_response_and_expected_results(
 
 def client_thread(answers_dict: dict, answers_keys_list: list) -> None:
     for _ in range(client_iterations):
+        if not KEEP_RUNNING:
+            break
+
         # Fetch a random key from all possibilities and shuffle it (creating a similar word)
         rand_answer_key = random.choice(answers_keys_list)
         rand_answer_key_list = list(rand_answer_key)
@@ -86,6 +94,8 @@ def _launch_clients(answers: dict, all_answers_keys_list: list) -> list:
     # Launch each client in his own thread
     threads = []
     for i in range(number_of_clients):
+        if not KEEP_RUNNING:
+            break
         Logger.log('Launching client #{}'.format(i), Logger.Level.DEBUG)
         curr_thread = threading.Thread(target=client_thread, args=(answers, all_answers_keys_list), daemon=True)
         curr_thread.start()
@@ -95,7 +105,24 @@ def _launch_clients(answers: dict, all_answers_keys_list: list) -> list:
     return threads
 
 
+def _signal_handler(sig, frame):
+    global KEEP_RUNNING
+
+    Logger.log('Signal detected', Logger.Level.DEBUG)
+
+    KEEP_RUNNING = False
+    time.sleep(3)
+    Logger.log('Bye!', Logger.Level.DEBUG)
+
+
+def _register_for_signals():
+    signal.signal(signal.SIGINT, _signal_handler)
+    signal.signal(signal.SIGTERM, _signal_handler)
+
+
 if __name__ == '__main__':
+    KEEP_RUNNING = True
+    _register_for_signals()
     answers = _parse_answers_file()
     # The keys are the sorted permutations. used to fetch a random test by clients
     all_answers_keys_list = list(answers.keys())
@@ -104,4 +131,4 @@ if __name__ == '__main__':
     for thread in threads:
         thread.join()
 
-    Logger.log('{} client finished working'.format(number_of_clients))
+    Logger.log('{} client finished working'.format(len(threads)))
