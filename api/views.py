@@ -16,13 +16,15 @@ def similar(request):
     if request.method == 'GET':
         if 'word' in request.GET:
             word = request.GET['word']  # TODO: check if missing
+            word = word.rstrip('\n').strip().lower()
+            sorted_word = ''.join(sorted(word.lower())) # sorted word will be used as the information key
+
             ret_dict = {'similar': []}
 
-            word = word.rstrip('\n').strip().lower()
-            # sorted word will be used as the information key
-            sorted_word = ''.join(sorted(word.lower()))
             if sorted_word in similar_words_dictionary:
-                ret_dict = similar_words_dictionary[sorted_word]
+                ret_dict = dict(similar_words_dictionary[sorted_word])
+                # if word in ret_dict['similar']:
+                #     ret_dict['similar'].remove(word)
 
             json_string = json.dumps(ret_dict)
             total_time = time() - begin

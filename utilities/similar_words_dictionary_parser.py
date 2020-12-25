@@ -8,6 +8,7 @@ from configurations import configuration
 class SimilarWordsDictionaryParser:
     _number_of_lines = 0
     _number_of_words = 0
+    _max_similar_group = -1
 
     @staticmethod
     def parse(path_to_file: str):
@@ -19,6 +20,7 @@ class SimilarWordsDictionaryParser:
         }
 
         SimilarWordsDictionaryParser._do_parse(path_to_file, similar_words_groups)
+
         Logger.log(
             'Parsing {}: found {} unique words out of {} total words combined in {} similarities groups'.format(
                 path_to_file, SimilarWordsDictionaryParser._number_of_words,
@@ -60,6 +62,8 @@ class SimilarWordsDictionaryParser:
                 # Filter out identical words
                 if word not in similar_words_groups[sorted_word]['similar']:
                     similar_words_groups[sorted_word]['similar'].append(word)
+                    SimilarWordsDictionaryParser._max_similar_group = \
+                        max(SimilarWordsDictionaryParser._max_similar_group, len(similar_words_groups[sorted_word]['similar']))
                     SimilarWordsDictionaryParser._number_of_words += 1
                 else:
                     Logger.log('Word duplication found for {}'.format(word))

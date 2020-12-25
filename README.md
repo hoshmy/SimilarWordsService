@@ -28,3 +28,7 @@ Palo Alto Task
         models.py
         tests.py
         views.py
+ 
+Instllation
+    sudo apt install python3-pip
+    python3 -m pip install Django
