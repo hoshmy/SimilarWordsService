@@ -2,6 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+import threading
 
 from utilities.stats_calculator import StatsCalculator
 from utilities.running_orchestrator import RunningOrchestrator
@@ -21,11 +22,21 @@ def main():
     execute_from_command_line(sys.argv)
 
 
-def similar_words_server_main():
-    StatsCalculator.init()
+def _similar_words_server_main() -> threading.Thread:
+    stats_thread = StatsCalculator.init()
+    return stats_thread
+
+
+def _deinit_stats_calculator():
+    # Adding stat_request will cause the statistics worker thread to exit
+    StatsCalculator.add_request_stat(0)
 
 
 if __name__ == '__main__':
-    similar_words_server_main()
+    stats_thread = _similar_words_server_main()
     main()
+
+    # Cleanup
     RunningOrchestrator.KEEP_RUNNING = False
+    _deinit_stats_calculator()
+    stats_thread.join()

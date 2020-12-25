@@ -3,57 +3,70 @@ import threading
 
 from utilities.logger import Logger
 from utilities.running_orchestrator import RunningOrchestrator
-from configurations import configuration
 
 
 class StatsCalculator:
-    _number_of_requests = 0  # Can overflow?
+    _number_of_requests = 0
     _timings_queue = queue.Queue()
     _accumulated_timings = 0.0
     _last_timing_pair = (0, 0.0)  # (_number_of_requests, _accumulated_timings) used for calculation synchronizing
     _running = False
 
     @staticmethod
-    def add_request_stat(timing):
+    def add_request_stat(timing: float) -> None:
         try:
+            # Non blocking put in synchronized queue. IF queue is full the sample is discarded
             StatsCalculator._timings_queue.put_nowait(timing)
         except queue.Full:
             Logger.log('StatsCalculator is Full, Stats doesnt handle incoming timings appropriately',
                        Logger.Level.WARNING)
 
     @staticmethod
-    def worker():
+    def init() -> threading.Thread:
+        thread = None
+        if not StatsCalculator._running:  # Avoid double initialization
+            thread = threading.Thread(target=StatsCalculator._worker, daemon=True)
+            thread.start()
+            StatsCalculator._running = True
+        else:
+            Logger.log('StatsCalculator double initialization was blocked', Logger.Level.WARNING)
+
+        # The thread is returned for client to join
+        return thread
+
+    @staticmethod
+    def get_stats() -> dict:
+        # single shot copying of statistics information to avoid inter threads interference
+        number_of_requests, accumulated_timings = tuple(StatsCalculator._last_timing_pair)
+        average_processing_time_ns = 0
+
+        if number_of_requests > 0:  # Avoid dividing by zero
+            accumulated_time_ns = accumulated_timings * 10**9  # Convert from seconds to nano seconds
+            average_processing_time_ns = int(accumulated_time_ns / number_of_requests)
+
+        answer = {
+            'totalRequests': number_of_requests,
+            'avgProcessingTimeNs': average_processing_time_ns
+        }
+
+        return answer
+
+    @staticmethod
+    def _worker() -> None:
         Logger.log('Stats calculator worker thread is up and running', Logger.Level.DEBUG)
         while RunningOrchestrator.KEEP_RUNNING:
             try:
+                # No timeout. the queue is released upon program exit from main
                 timing_sample = \
-                    StatsCalculator._timings_queue.get(block=True, timeout=configuration.stats_calculator_timeout)
+                    StatsCalculator._timings_queue.get(block=True)
                 StatsCalculator._accumulated_timings += timing_sample
                 StatsCalculator._number_of_requests += 1
+
+                # Save a statistics pair for perfect synchronization upon stats query
                 StatsCalculator._last_timing_pair = \
                     (StatsCalculator._number_of_requests, StatsCalculator._accumulated_timings)
             except queue.Empty:
                 pass
 
+        StatsCalculator._running = False
         Logger.log('Stats calculator worker thread is Down', Logger.Level.DEBUG)
-
-    @staticmethod
-    def init():
-        if not StatsCalculator._running:
-            # turn-on the worker thread
-            threading.Thread(target=StatsCalculator.worker, daemon=True).start()
-            StatsCalculator._running = True
-
-    @staticmethod
-    def get_stats():
-        current_timing_pair = (StatsCalculator._last_timing_pair[0], StatsCalculator._last_timing_pair[1])
-        average_processing_time_ns = 0
-        if StatsCalculator._last_timing_pair[0]:
-            accumulated_time_ns = StatsCalculator._last_timing_pair[1] * 10**9
-            average_processing_time_ns = int(accumulated_time_ns / StatsCalculator._last_timing_pair[0])
-        answer = {
-            'totalRequests': StatsCalculator._last_timing_pair[0],
-            'avgProcessingTimeNs': average_processing_time_ns
-        }
-
-        return answer

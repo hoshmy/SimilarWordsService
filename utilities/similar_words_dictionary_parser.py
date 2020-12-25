@@ -2,17 +2,15 @@ import os
 import sys
 
 from utilities.logger import Logger
-from configurations import configuration
+import configuration
 
 
 class SimilarWordsDictionaryParser:
     _number_of_lines = 0
     _number_of_words = 0
-    _max_similar_group = -1
 
     @staticmethod
-    def parse(path_to_file: str):
-
+    def parse(path_to_file: str) -> (dict, int):
         # Reset previous runs
         similar_words_groups = {
             # 'aab': {'similar':['aba', 'aab', 'baa']},
@@ -29,10 +27,9 @@ class SimilarWordsDictionaryParser:
         return SimilarWordsDictionaryParser._number_of_words, similar_words_groups
 
     @staticmethod
-    def _do_parse(path_to_file: str, similar_words_groups: dict):
+    def _do_parse(path_to_file: str, similar_words_groups: dict) -> None:
 
         try:
-            Logger.log(os.getcwd())
             if os.path.isfile(path_to_file):
                 with open(path_to_file, 'r') as file:
                     for line_from_file in file:
@@ -42,14 +39,12 @@ class SimilarWordsDictionaryParser:
                 Logger.log('File "{}" doesn\'t exists'.format(path_to_file), Logger.Level.FATAL)
         except IOError as e:
             Logger.log('I/O error({}): {}'.format(e.errno, e.strerror), Logger.Level.FATAL)
-            sys.exit(-1)
         except:  # handle other exceptions such as attribute errors
             Logger.log('Unexpected error: {}'.format(sys.exc_info()[0]), Logger.Level.FATAL)
-            sys.exit(-1)
 
     @staticmethod
-    def _add_word(line_from_file: str, similar_words_groups: dict):
-        # Remove ending \n
+    def _add_word(line_from_file: str, similar_words_groups: dict) -> None:
+        # Remove ending \n TODO - test with \r\n
         # Remove trailing and leading white character
         # set to lower case - words meaning is case insensitive
         word = line_from_file.rstrip('\n').strip().lower()
@@ -62,8 +57,6 @@ class SimilarWordsDictionaryParser:
                 # Filter out identical words
                 if word not in similar_words_groups[sorted_word]['similar']:
                     similar_words_groups[sorted_word]['similar'].append(word)
-                    SimilarWordsDictionaryParser._max_similar_group = \
-                        max(SimilarWordsDictionaryParser._max_similar_group, len(similar_words_groups[sorted_word]['similar']))
                     SimilarWordsDictionaryParser._number_of_words += 1
                 else:
                     Logger.log('Word duplication found for {}'.format(word))
@@ -76,4 +69,4 @@ class SimilarWordsDictionaryParser:
 
 
 if __name__ == '__main__':
-    parser = SimilarWordsDictionaryParser.parse(configuration.path_to_dictionary_file)
+    num_of_words, parsed_dict = SimilarWordsDictionaryParser.parse(configuration.path_to_dictionary_file)

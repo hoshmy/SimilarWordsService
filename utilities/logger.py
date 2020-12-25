@@ -1,3 +1,4 @@
+import sys
 from enum import Enum
 
 
@@ -15,9 +16,13 @@ class Logger:
     }
 
     @staticmethod
-    def log(message, level=Level.WARNING):
+    def log(message: str, level=Level.WARNING) -> None:
         color = Logger._colors[level.value]
-        print('{}{}{}'.format(color, message, Logger._colors['END']))
+        formatted_message = '{}{}{}\n'.format(color, message, Logger._colors['END'])
+        if level == Logger.Level.DEBUG:
+            print(formatted_message, end='')
+        else:
+            sys.stderr.write(formatted_message)
 
 
 if __name__ == '__main__':

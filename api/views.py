@@ -1,17 +1,18 @@
-from django.http import HttpResponse
 import json
 from time import time
 import copy
 
-from configurations import configuration
+from django.http import HttpResponse, HttpRequest
+
+import configuration
 from utilities.similar_words_dictionary_parser import SimilarWordsDictionaryParser
 from utilities.stats_calculator import StatsCalculator
 
-parser = SimilarWordsDictionaryParser()
-number_of_words_in_dictionary, similar_words_dictionary = parser.parse(configuration.path_to_dictionary_file)
+number_of_words_in_dictionary, similar_words_dictionary = \
+    SimilarWordsDictionaryParser.parse(configuration.path_to_dictionary_file)
 
 
-def similar(request):
+def similar(request: HttpRequest) -> HttpResponse:
     begin = time()
     if request.method == 'GET':
         if 'word' in request.GET:
@@ -40,7 +41,7 @@ def similar(request):
     return HttpResponse('')
 
 
-def stats(request):
+def stats(request: HttpRequest) -> HttpResponse:
     if request.method == 'GET':
         # Fetch Statistics
         stats_dict = StatsCalculator.get_stats()
