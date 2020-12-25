@@ -13,7 +13,7 @@ from utilities.logger import Logger
 client_iterations = 100000
 client_sleep_time = 1e-6
 number_of_clients = 20
-expected_answers_file = 'generated_answers.txt'
+expected_answers_file = 'tests/generated_answers.txt'
 clients_launch_time_delta = 1
 server_url = 'http://127.0.0.1:8000/api/v1/similar'
 reconnection_time_delta = 5
