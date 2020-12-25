@@ -130,3 +130,5 @@ dmypy.json
 /questions.txt
 /.idea
 /playground.py
+/tests/generated_dictionary.txt
+/tests/generated_answers.txt
