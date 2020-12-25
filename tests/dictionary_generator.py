@@ -8,7 +8,7 @@ import json
 class DictionaryGenerator:
     _configuration = {
         'file_name': 'generated',
-        'number_of_words': 400000
+        'number_of_words': 500001
     }
 
     _generated_words = []
