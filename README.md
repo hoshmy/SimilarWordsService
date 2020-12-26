@@ -97,7 +97,7 @@ Tests errors, if occurred will be printed to stderr.
 If no errors detected - no prints will be done
   
 **Configuration**
-In the <project folder>/configuration.py where the variable path_to_dictionary_file can be changed to point to another file
+In the <project folder>/configuration.py where the variable Configuration.path_to_dictionary_file can be changed to point to another file
 Its value must be a relative path starting from <project folder> or an absolute complete path
 
 **Code highlights**
