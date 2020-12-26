@@ -24,14 +24,16 @@ def main():
 
 
 def _similar_words_server_main() -> threading.Thread:
-    # Filterout the auto reloader mock run
-    if not os.environ.get('RUN_MAIN'):
-        stats_thread = StatsCalculator.init()
+    stats_thread_instance = None
+
+    # Filter out the auto reloader mock run
+    if os.environ.get('RUN_MAIN'):
+        stats_thread_instance = StatsCalculator.init()
 
         if os.environ.get('test'):
             Logger.log('Running Test mode', Logger.Level.DEBUG)
 
-        return stats_thread
+    return stats_thread_instance
 
 
 def _deinit_stats_calculator():

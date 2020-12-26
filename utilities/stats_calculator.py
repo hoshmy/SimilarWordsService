@@ -1,5 +1,6 @@
 import queue
 import threading
+import time
 
 from utilities.logger import Logger
 from utilities.running_orchestrator import RunningOrchestrator
@@ -11,6 +12,7 @@ class StatsCalculator:
     _accumulated_timings = 0.0
     _last_timing_pair = (0, 0.0)  # (_number_of_requests, _accumulated_timings) used for calculation synchronizing
     _running = False
+    _worker_thread_yield_time = 1e-6
 
     @staticmethod
     def add_request_stat(timing: float) -> None:
@@ -65,6 +67,7 @@ class StatsCalculator:
                 # Save a statistics pair for perfect synchronization upon stats query
                 StatsCalculator._last_timing_pair = \
                     (StatsCalculator._number_of_requests, StatsCalculator._accumulated_timings)
+                time.sleep(StatsCalculator._worker_thread_yield_time)
             except queue.Empty:
                 pass
 
