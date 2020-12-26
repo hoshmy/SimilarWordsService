@@ -21,7 +21,7 @@ class DictionaryGenerator:
     @staticmethod
     def create() -> None:
         DictionaryGenerator._generate(num_of_words=number_of_words)
-        print('finished generation')
+        print('finished preparing data - starting to generate files')
         DictionaryGenerator._prepare_files(file_name=file_name_prolog)
         print('finished files writing')
 
