@@ -64,11 +64,11 @@ http://localhost:8000/api/v1/stats
   - Linux Ubuntu 20.04
 
 **Installation**
-  - sudo apt install python3.8
+  - sudo apt -y install python3.8
     Can be verified using: python3.8 --version. Answer: Python 3.8.5
-  - sudo apt install python3-pip
-  - python3 -m pip install Django
-    Can be verified using python3 -c "import django; print(django.get_version())"
+  - sudo apt -y install python3-pip
+  - python3.8 -m pip install Django
+    Can be verified using python3.8 -c "import django; print(django.get_version())"
     Answer: 3.1.4
     
     Note: It is most likely that any python 3.7+ version and django 3.1+ version could work just fine
@@ -79,12 +79,22 @@ chmod +x run_service.sh
 ./run_service
 
 **Run tests**
-  - Run the service
-  - cd to the project's folder
-  - chmod +x run_test.sh
-  - ./run_service.sh
-  - The tests generates its own dictionary - therefore it takes a little while for the test to begin
-  - The tests leaves 2 files in the file system that can be discarded after the test has finished
+The tests are dependant on tests generated files: tests/generated_dictionary.txt and test/generated_answers.txt
+These files should be generated once before running the tests. Regeneration will run previous files with new random results
+  - Generate the tests files once by running generate_test_files.sh
+
+Once the tests files exists, run the tests:  
+  - Run service as test
+      * cd to the project's folder
+      * chmod +x run_test.sh
+      * ./run_service_test.sh
+  - Run clients test:
+      * Open another terminal
+      * cd to the project's folder
+      * ./run_test.sh
+  
+Tests errors, if occurred will be printed to stderr.
+If no errors detected - no prints will be done
   
 **Configuration**
 In the <project folder>/configuration.py where the variable path_to_dictionary_file can be changed to point to another file
