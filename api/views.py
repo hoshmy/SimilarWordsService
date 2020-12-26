@@ -4,12 +4,12 @@ import copy
 
 from django.http import HttpResponse, HttpRequest
 
-import configuration
+from configuration import Configuration
 from utilities.similar_words_dictionary_parser import SimilarWordsDictionaryParser
 from utilities.stats_calculator import StatsCalculator
 
 number_of_words_in_dictionary, similar_words_dictionary = \
-    SimilarWordsDictionaryParser.parse(configuration.path_to_dictionary_file)
+    SimilarWordsDictionaryParser.parse(Configuration.get_path_to_dictionary_file())
 
 
 def similar(request: HttpRequest) -> HttpResponse:

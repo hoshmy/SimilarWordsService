@@ -6,6 +6,7 @@ import threading
 
 from utilities.stats_calculator import StatsCalculator
 from utilities.running_orchestrator import RunningOrchestrator
+from utilities.logger import Logger
 
 
 def main():
@@ -23,8 +24,13 @@ def main():
 
 
 def _similar_words_server_main() -> threading.Thread:
+    # Filterout the auto reloader mock run
     if not os.environ.get('RUN_MAIN'):
         stats_thread = StatsCalculator.init()
+
+        if os.environ.get('test'):
+            Logger.log('Running Test mode', Logger.Level.DEBUG)
+
         return stats_thread
 
 
